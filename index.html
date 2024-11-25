@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timbratura con Posizione</title>
+  <script>
+    function redirectToForm() {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdHqvqH-iR25ov5AZ0TqbneBrzLOclprKZ-bHZukgBd8ulTAw/viewform?usp=pp_url&entry.226632478=" + latitude + "," + longitude;
+        window.location.href = formUrl;
+      }, function(error) {
+        alert("Errore nel recupero della posizione. Abilita la geolocalizzazione e riprova.");
+      });
+    }
+  </script>
+</head>
+<body onload="redirectToForm()">
+  <h1>Reindirizzamento in corso...</h1>
+</body>
+</html>
