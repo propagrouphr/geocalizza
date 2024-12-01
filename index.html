@@ -1,21 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timbratura con Posizione</title>
+  <style>
+    #consent-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #f8f9fa;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+    #consent-banner button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #consent-banner button:hover {
+      background-color: #0056b3;
+    }
+    #consent-banner p {
+      margin: 10px 0 0;
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
   <script>
     function redirectToForm() {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdHqvqH-iR25ov5AZ0TqbneBrzLOclprKZ-bHZukgBd8ulTAw/viewform?usp=pp_url&entry.226632478=" + latitude + "," + longitude;
-        window.location.href = formUrl;
-      }, function(error) {
-        alert("Errore nel recupero della posizione. Abilita la geolocalizzazione e riprova.");
-      });
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdHqvqH-iR25ov5AZ0TqbneBrzLOclprKZ-bHZukgBd8ulTAw/viewform?usp=pp_url&entry.226632478=${latitude},${longitude}`;
+          window.location.href = formUrl;
+        },
+        function(error) {
+          let errorMessage = "Errore sconosciuto.";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Accesso alla posizione negato. Abilita la geolocalizzazione e riprova.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Informazioni sulla posizione non disponibili.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Timeout nel recupero della posizione.";
+              break;
+          }
+          alert(errorMessage);
+        },
+        { timeout: 10000 } // Timeout di 10 secondi
+      );
+    }
+
+    // Mostra il banner al caricamento della pagina
+    document.addEventListener("DOMContentLoaded", function() {
+      const consentBanner = document.getElementById("consent-banner");
+      consentBanner.style.display = "block";
+    });
+
+    function acceptConsent() {
+      const consentBanner = document.getElementById("consent-banner");
+      consentBanner.style.display = "none"; // Nascondi il banner
+      redirectToForm(); // Avvia il reindirizzamento
     }
   </script>
 </head>
-<body onload="redirectToForm()">
-  <h1>Reindirizzamento in corso...</h1>
+<body>
+  <h1>Benvenuto!</h1>
+  <p>Clicca "Accetto" per procedere con il reindirizzamento.</p>
+
+  <div id="consent-banner" style="display: none;">
+    Questo sito utilizza la tua posizione per reindirizzarti a un modulo specifico. Continuando, accetti l'uso della tua posizione. 
+    <button onclick="acceptConsent()">Accetto</button>
+    <p>Se cambi idea, puoi sempre eliminare le coordinate direttamente nel modulo Google prima di inviarlo.</p>
+  </div>
 </body>
 </html>
