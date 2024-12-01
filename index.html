@@ -34,53 +34,54 @@
     }
   </style>
   <script>
-    function redirectToForm() {
+    function redirectToFormWithGeolocation() {
       navigator.geolocation.getCurrentPosition(
-        function(position) {
+        function (position) {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
           const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSdHqvqH-iR25ov5AZ0TqbneBrzLOclprKZ-bHZukgBd8ulTAw/viewform?usp=pp_url&entry.226632478=${latitude},${longitude}`;
           window.location.href = formUrl;
         },
-        function(error) {
-          let errorMessage = "Errore sconosciuto.";
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = "Accesso alla posizione negato. Abilita la geolocalizzazione e riprova.";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = "Informazioni sulla posizione non disponibili.";
-              break;
-            case error.TIMEOUT:
-              errorMessage = "Timeout nel recupero della posizione.";
-              break;
-          }
-          alert(errorMessage);
-        },
-        { timeout: 10000 } // Timeout di 10 secondi
+        function (error) {
+          // Se l'utente rifiuta, reindirizza senza coordinate
+          alert("Accesso alla geolocalizzazione negato. Sarai reindirizzato senza coordinate.");
+          redirectToFormWithoutGeolocation();
+        }
       );
     }
 
+    function redirectToFormWithoutGeolocation() {
+      const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdHqvqH-iR25ov5AZ0TqbneBrzLOclprKZ-bHZukgBd8ulTAw/viewform";
+      window.location.href = formUrl;
+    }
+
     // Mostra il banner al caricamento della pagina
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const consentBanner = document.getElementById("consent-banner");
       consentBanner.style.display = "block";
     });
 
-    function acceptConsent() {
+    function acceptGeolocationConsent() {
       const consentBanner = document.getElementById("consent-banner");
       consentBanner.style.display = "none"; // Nascondi il banner
-      redirectToForm(); // Avvia il reindirizzamento
+      redirectToFormWithGeolocation(); // Reindirizza con geolocalizzazione
+    }
+
+    function declineGeolocationConsent() {
+      const consentBanner = document.getElementById("consent-banner");
+      consentBanner.style.display = "none"; // Nascondi il banner
+      redirectToFormWithoutGeolocation(); // Reindirizza senza geolocalizzazione
     }
   </script>
 </head>
 <body>
   <h1>Benvenuto!</h1>
-  <p>Clicca "Accetto" per procedere con il reindirizzamento.</p>
+  <p>Seleziona un'opzione per continuare.</p>
 
   <div id="consent-banner" style="display: none;">
-    Questo sito utilizza la tua posizione per reindirizzarti a un modulo specifico. Continuando, accetti l'uso della tua posizione. 
-    <button onclick="acceptConsent()">Accetto</button>
+    Questo sito utilizza la tua posizione per reindirizzarti a un modulo specifico. Puoi scegliere di accettare o rifiutare l'uso della tua posizione.
+    <button onclick="acceptGeolocationConsent()">Accetto</button>
+    <button onclick="declineGeolocationConsent()">Rifiuto</button>
     <p>Se cambi idea, puoi sempre eliminare le coordinate direttamente nel modulo Google prima di inviarlo.</p>
   </div>
 </body>
